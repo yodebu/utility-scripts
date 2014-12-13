@@ -1,0 +1,48 @@
+'''
+Usage: Add a filler file and change the script suitably and then paste this script into root directory of your Anime and execute this script from there.
+'''
+
+#!/usr/bin/env python
+
+import os, re
+
+def generate_filler_list(path):
+	f = open(path)
+	content = f.read().split(',')
+
+	filler_episodes = []
+
+	for node in content:
+		if len(node.split('-')) is 2:
+			aa = node.split('-')
+			for x in range(int(node.split('-')[0]), int(node.split('-')[1])+1):
+				filler_episodes.append(str(x))
+		else:
+			filler_episodes.append(str(int(node)))
+
+	return filler_episodes
+	
+
+if __name__ == '__main__':
+	path = '/home/ryuk/naruto_filler'   # This is filler_file path. Add this first
+	fillers = generate_filler_list(path)
+	fillers = set(fillers)
+
+	found_fillers = 0
+
+	for root, dirs, files in os.walk("."):
+		for filename in files:
+			numslist = re.findall(r'\d+', filename)
+			for num in numslist:
+				if str(int(num)) in fillers:
+					actual_filepath = os.path.join(root, filename)
+					new_filepath = os.path.join(root, '.' + filename)
+
+					os.rename(actual_filepath, new_filepath)
+					print ('renaming %s =========> %s' % (actual_filepath, new_filepath))
+
+					found_fillers = found_fillers + 1
+					break
+							
+	print ('Fillers Listed in file: ', len(fillers))
+	print ('Fillers found using script: ', found_fillers)
